@@ -41,16 +41,14 @@ part2Rec all@(head:tail) sum fst sec
         if fst < 10
             then part2Rec tail sum fst headInt
             else part2Rec tail sum headInt sec
-    | Data.Maybe.isJust parsedDigit =
-        if fst < 10
-            then part2Rec parseTail sum fst parsedDigit'
-            else part2Rec parseTail sum parsedDigit' sec
-    | otherwise = part2Rec tail sum fst sec
+    | otherwise = case tryParseInt all of
+        (parseTail, Just parsedDigit) -> if fst < 10
+            then part2Rec parseTail sum fst parsedDigit
+            else part2Rec parseTail sum parsedDigit sec
+        _ -> part2Rec tail sum fst sec
     where sec' = secondDigit fst sec
           new = finalAdd fst sec'
           headInt = Data.Char.ord head - zeroDigit
-          (parseTail, parsedDigit) = tryParseInt all
-          parsedDigit' = Data.Maybe.fromMaybe 10 parsedDigit
 
 tryParseInt :: String -> (String, Maybe Int)
 tryParseInt ('o':rest) = tryParseInt1 rest P1GetN
