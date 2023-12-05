@@ -32,20 +32,17 @@ pub fn part_2(input: &str) -> usize {
     let mut first = 10;
     let mut second = 10;
     while i < input.len() {
-        // println!("char: {:?}", input[i] as char);
         if input[i] == b'\n' {
             if second > 9 {
                 second = first;
             }
             let new = first * 10 + second;
-            // println!("number: {new}");
             sum += new;
             first = 10;
             second = 10;
             i += 1;
         } else if input[i].is_ascii_digit() {
             let digit = (input[i] - b'0') as usize;
-            // println!("digit: {digit}");
             if first > 9 {
                 first = digit;
             } else {
@@ -55,7 +52,6 @@ pub fn part_2(input: &str) -> usize {
         } else {
             let old = i;
             if let Some(digit) = try_get_digit(input, &mut i) {
-                // println!("found number: {digit}");
                 if first > 9 {
                     first = digit;
                 } else {
@@ -63,17 +59,14 @@ pub fn part_2(input: &str) -> usize {
                 }
             }
             if old == i {
-                // println!("no update to i");
                 i += 1;
             }
-            // i += (old == i) as usize;
         }
     }
     sum
 }
 
 fn try_get_digit(input: &[u8], cursor: &mut usize) -> Option<usize> {
-    // println!("attempting word starting at: {} ({})", input[*cursor] as char, input[*cursor..].iter().take(10).take_while(|&&b| b != b'\n').map(|&b| b as char).collect::<String>());
     match input[*cursor] {
         b'o' => {
             *cursor += 1;
@@ -99,7 +92,7 @@ fn try_get_digit(input: &[u8], cursor: &mut usize) -> Option<usize> {
             *cursor += 1;
             try_get_9(input, cursor)
         }
-        _ => None
+        _ => None,
     }
 }
 
@@ -107,9 +100,7 @@ fn try_get_1(input: &[u8], cursor: &mut usize) -> Option<usize> {
     let mut i = *cursor;
     if input[i] == b'n' {
         i += 1;
-        // println!("1: {:?}", input[*cursor] as char);
         if input[i] == b'e' {
-            // *cursor += 1;
             *cursor = i;
             Some(1)
         } else {
@@ -124,9 +115,7 @@ fn try_get_23(input: &[u8], cursor: &mut usize) -> Option<usize> {
     let mut i = *cursor;
     if input[i] == b'w' {
         i += 1;
-        // println!("23: {:?}", input[*cursor] as char);
         if input[i] == b'o' {
-            // *cursor += 1;
             *cursor = i;
             Some(2)
         } else {
@@ -134,15 +123,11 @@ fn try_get_23(input: &[u8], cursor: &mut usize) -> Option<usize> {
         }
     } else if input[i] == b'h' {
         i += 1;
-        // println!("23: {:?}", input[*cursor] as char);
         if input[i] == b'r' {
             i += 1;
-            // println!("23: {:?}", input[*cursor] as char);
             if input[i] == b'e' {
                 i += 1;
-                // println!("23: {:?}", input[*cursor] as char);
                 if input[i] == b'e' {
-                    // *cursor += 1;
                     *cursor = i;
                     Some(3)
                 } else {
@@ -163,12 +148,9 @@ fn try_get_45(input: &[u8], cursor: &mut usize) -> Option<usize> {
     let mut i = *cursor;
     if input[i] == b'o' {
         i += 1;
-        // println!("45: {:?}", input[*cursor] as char);
         if input[i] == b'u' {
             i += 1;
-            // println!("45: {:?}", input[*cursor] as char);
             if input[i] == b'r' {
-                // *cursor += 1;
                 *cursor = i;
                 Some(4)
             } else {
@@ -179,12 +161,9 @@ fn try_get_45(input: &[u8], cursor: &mut usize) -> Option<usize> {
         }
     } else if input[i] == b'i' {
         i += 1;
-        // println!("45: {:?}", input[*cursor] as char);
         if input[i] == b'v' {
             i += 1;
-            // println!("45: {:?}", input[*cursor] as char);
             if input[i] == b'e' {
-                // *cursor += 1;
                 *cursor = i;
                 Some(5)
             } else {
@@ -202,9 +181,7 @@ fn try_get_67(input: &[u8], cursor: &mut usize) -> Option<usize> {
     let mut i = *cursor;
     if input[i] == b'i' {
         i += 1;
-        // println!("67: {:?}", input[*cursor] as char);
         if input[i] == b'x' {
-            // *cursor += 1;
             *cursor = i;
             Some(6)
         } else {
@@ -212,15 +189,11 @@ fn try_get_67(input: &[u8], cursor: &mut usize) -> Option<usize> {
         }
     } else if input[i] == b'e' {
         i += 1;
-        // println!("67: {:?}", input[*cursor] as char);
         if input[i] == b'v' {
             i += 1;
-            // println!("67: {:?}", input[*cursor] as char);
             if input[i] == b'e' {
                 i += 1;
-                // println!("67: {:?}", input[*cursor] as char);
                 if input[i] == b'n' {
-                    // *cursor += 1;
                     *cursor = i;
                     Some(7)
                 } else {
@@ -241,15 +214,11 @@ fn try_get_8(input: &[u8], cursor: &mut usize) -> Option<usize> {
     let mut i = *cursor;
     if input[i] == b'i' {
         i += 1;
-        // println!("8: {:?}", input[*cursor] as char);
         if input[i] == b'g' {
             i += 1;
-            // println!("8: {:?}", input[*cursor] as char);
             if input[i] == b'h' {
                 i += 1;
-                // println!("8: {:?}", input[*cursor] as char);
                 if input[i] == b't' {
-                    // *cursor += 1;
                     Some(8)
                 } else {
                     None
@@ -269,12 +238,9 @@ fn try_get_9(input: &[u8], cursor: &mut usize) -> Option<usize> {
     let mut i = *cursor;
     if input[i] == b'i' {
         i += 1;
-        // println!("9: {:?}", input[*cursor] as char);
         if input[i] == b'n' {
             i += 1;
-            // println!("9: {:?}", input[*cursor] as char);
             if input[i] == b'e' {
-                // *cursor += 1;
                 *cursor = i;
                 Some(9)
             } else {
@@ -289,6 +255,7 @@ fn try_get_9(input: &[u8], cursor: &mut usize) -> Option<usize> {
 }
 
 #[cfg(test)]
+#[allow(unused_imports)]
 mod test {
     use std::fs::read_to_string;
 

@@ -1,12 +1,4 @@
 import D1Lib
-import qualified System.IO
+import Misc
 
-inputFile :: String
-inputFile = "input/d1.txt"
-
-main = do
-    contents <- System.IO.readFile inputFile
-    let part1Out = part1 contents
-        part2Out = part2 contents
-    putStrLn $ "p1: " ++ show part1Out
-    putStrLn $ "p2: " ++ show part2Out
+main = Misc.aocMain "input/d1.txt" D1Lib.part1 D1Lib.part2
