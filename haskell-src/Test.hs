@@ -1,4 +1,5 @@
 import qualified D1Lib
+import qualified D2Lib
 import qualified System.IO
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -12,6 +13,9 @@ tests =
         [ aocTestCase "d1p1" "input/d1test1.txt" D1Lib.part1 142
         , aocTestCase "d1p2 (1)" "input/d1test2.txt" D1Lib.part2 281
         , aocTestCase "d1p2 (2)" "input/d1test3.txt" D1Lib.part2 316
+        , testCase "d2 readID" $ D2Lib.readID "123: a" 0 @?= ("a", 123)
+        , aocTestCase "d2p1" "input/d2test.txt" D2Lib.part1 8
+        , aocTestCase "d2p2" "input/d2test.txt" D2Lib.part2 2286
         ]
 
 aocTestCase :: (Eq a, Show a) => String -> String -> (String -> a) -> a -> TestTree

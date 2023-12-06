@@ -6,14 +6,23 @@ executable d1
     main-is: D1Bin.hs
     hs-source-dirs: haskell-src
     other-modules: D1Lib, Misc
-    build-depends: base ^>=4.16.4.0
+    build-depends:
+        base >= 4 && < 5
+    default-language: Haskell2010
+
+executable d2
+    main-is: D2Bin.hs
+    hs-source-dirs: haskell-src
+    other-modules: D2Lib, Misc
+    build-depends:
+        base >= 4 && < 5
     default-language: Haskell2010
 
 test-suite test
     main-is: Test.hs
     type: exitcode-stdio-1.0
     hs-source-dirs: haskell-src
-    other-modules: D1Lib
+    other-modules: D1Lib, D2Lib
     build-depends:
         base >=4 && < 5,
         tasty >=1.5,
@@ -24,6 +33,6 @@ benchmark bench
     main-is: Bench.hs
     type: exitcode-stdio-1.0
     hs-source-dirs: haskell-src
-    other-modules: D1Lib
+    other-modules: D1Lib, D2Lib
     build-depends: base >= 4 && < 5, criterion
     default-language: Haskell2010

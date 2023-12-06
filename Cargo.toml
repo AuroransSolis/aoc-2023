@@ -19,6 +19,10 @@ path = "rust-src/util.rs"
 name = "d1"
 path = "rust-src/d1bin.rs"
 
+[[bin]]
+name = "d2"
+path = "rust-src/d2bin.rs"
+
 [[bench]]
 name = "bench"
 path = "rust-src/bench.rs"
