@@ -24,15 +24,16 @@ part1Rec "" sum = sum
 part1Rec (head : tail) sum
     | head == 'G' = part1Rec addRest $ sum + add
     | otherwise = error "???"
-    where
-        (idRest, id) = readID (drop 4 tail) 0
-        (addRest, add) = getAdd idRest id (0, 0, 0)
+  where
+    (idRest, id) = readID (drop 4 tail) 0
+    (addRest, add) = getAdd idRest id (0, 0, 0)
 
 readID :: String -> Int -> (String, Int)
 readID (head : tail) sum
     | Data.Char.isDigit head = readID tail $ sum * 10 + headDigit
     | otherwise = (drop 1 tail, sum)
-    where headDigit = Data.Char.ord head - zeroDigit
+  where
+    headDigit = Data.Char.ord head - zeroDigit
 
 getAdd :: String -> Int -> (Int, Int, Int) -> (String, Int)
 getAdd all@(head : tail) id maxes@(gameMaxR, gameMaxG, gameMaxB)
@@ -41,11 +42,11 @@ getAdd all@(head : tail) id maxes@(gameMaxR, gameMaxG, gameMaxB)
     | head == ',' || head == ';' = getAdd (drop 1 tail) id maxes
     | Data.Char.isDigit head = getAdd colourRest id updatedMaxes
     | otherwise = getAdd tail id maxes
-    where
-        headDigit = Data.Char.ord head - zeroDigit
-        (countRest, count) = getCount tail headDigit
-        (colourRest, colour) = getColour countRest
-        updatedMaxes = updateMaxes count colour maxes
+  where
+    headDigit = Data.Char.ord head - zeroDigit
+    (countRest, count) = getCount tail headDigit
+    (colourRest, colour) = getColour countRest
+    updatedMaxes = updateMaxes count colour maxes
 
 consumeLine :: String -> String
 consumeLine (head : rest)
@@ -56,7 +57,8 @@ getCount :: String -> Int -> (String, Int)
 getCount (head : tail) sum
     | Data.Char.isDigit head = getCount tail $ sum * 10 + headDigit
     | otherwise = (tail, sum)
-    where headDigit = Data.Char.ord head - zeroDigit
+  where
+    headDigit = Data.Char.ord head - zeroDigit
 
 getColour :: String -> (String, Colour)
 getColour ('r' : tail) = (drop 2 tail, Red)
@@ -77,11 +79,11 @@ part2Rec "" sum = sum
 part2Rec all@(head : tail) sum
     | head == 'G' = part2Rec powerRest $ sum + power
     | otherwise = error "???"
-    where
-        getStart (gsHead : gsTail)
-            | gsHead == ':' = drop 1 gsTail
-            | otherwise = getStart gsTail
-        (powerRest, power) = getPower (getStart $ drop 5 tail) (0, 0, 0)
+  where
+    getStart (gsHead : gsTail)
+        | gsHead == ':' = drop 1 gsTail
+        | otherwise = getStart gsTail
+    (powerRest, power) = getPower (getStart $ drop 5 tail) (0, 0, 0)
 
 getPower :: String -> (Int, Int, Int) -> (String, Int)
 getPower all@(head : tail) maxes@(gameMaxR, gameMaxG, gameMaxB)
@@ -89,8 +91,8 @@ getPower all@(head : tail) maxes@(gameMaxR, gameMaxG, gameMaxB)
     | head == ',' || head == ';' = getPower (drop 1 tail) maxes
     | Data.Char.isDigit head = getPower colourRest updatedMaxes
     | otherwise = getPower tail maxes
-    where
-        headDigit = Data.Char.ord head - zeroDigit
-        (countRest, count) = getCount tail headDigit
-        (colourRest, colour) = getColour countRest
-        updatedMaxes = updateMaxes count colour maxes 
+  where
+    headDigit = Data.Char.ord head - zeroDigit
+    (countRest, count) = getCount tail headDigit
+    (colourRest, colour) = getColour countRest
+    updatedMaxes = updateMaxes count colour maxes
