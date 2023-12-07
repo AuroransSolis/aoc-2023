@@ -1,5 +1,6 @@
 module D2Lib (part1, part2, readID) where
 
+import qualified Misc
 import qualified Data.Char
 
 maxR :: Int
@@ -10,9 +11,6 @@ maxG = 13
 
 maxB :: Int
 maxB = 14
-
-zeroDigit :: Int
-zeroDigit = Data.Char.ord '0'
 
 data Colour = Red | Green | Blue
 
@@ -33,7 +31,7 @@ readID (head : tail) sum
     | Data.Char.isDigit head = readID tail $ sum * 10 + headDigit
     | otherwise = (drop 1 tail, sum)
   where
-    headDigit = Data.Char.ord head - zeroDigit
+    headDigit = Data.Char.ord head - Misc.zeroDigit
 
 getAdd :: String -> Int -> (Int, Int, Int) -> (String, Int)
 getAdd all@(head : tail) id maxes@(gameMaxR, gameMaxG, gameMaxB)
@@ -43,7 +41,7 @@ getAdd all@(head : tail) id maxes@(gameMaxR, gameMaxG, gameMaxB)
     | Data.Char.isDigit head = getAdd colourRest id updatedMaxes
     | otherwise = getAdd tail id maxes
   where
-    headDigit = Data.Char.ord head - zeroDigit
+    headDigit = Data.Char.ord head - Misc.zeroDigit
     (countRest, count) = getCount tail headDigit
     (colourRest, colour) = getColour countRest
     updatedMaxes = updateMaxes count colour maxes
@@ -58,7 +56,7 @@ getCount (head : tail) sum
     | Data.Char.isDigit head = getCount tail $ sum * 10 + headDigit
     | otherwise = (tail, sum)
   where
-    headDigit = Data.Char.ord head - zeroDigit
+    headDigit = Data.Char.ord head - Misc.zeroDigit
 
 getColour :: String -> (String, Colour)
 getColour ('r' : tail) = (drop 2 tail, Red)
@@ -92,7 +90,7 @@ getPower all@(head : tail) maxes@(gameMaxR, gameMaxG, gameMaxB)
     | Data.Char.isDigit head = getPower colourRest updatedMaxes
     | otherwise = getPower tail maxes
   where
-    headDigit = Data.Char.ord head - zeroDigit
+    headDigit = Data.Char.ord head - Misc.zeroDigit
     (countRest, count) = getCount tail headDigit
     (colourRest, colour) = getColour countRest
     updatedMaxes = updateMaxes count colour maxes

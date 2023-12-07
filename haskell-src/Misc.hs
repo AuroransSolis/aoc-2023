@@ -1,5 +1,6 @@
 module Misc (aocMain) where
 
+import qualified Data.Char
 import qualified System.IO
 
 aocMain :: (Show a, Show b) => String -> (String -> a) -> (String -> b) -> IO ()
@@ -9,3 +10,6 @@ aocMain filename part1 part2 = do
         part2Out = part2 contents
     putStrLn $ "p1: " ++ show part1Out
     putStrLn $ "p2: " ++ show part2Out
+
+zeroDigit :: Int
+zeroDigit = Data.Char.ord '0'

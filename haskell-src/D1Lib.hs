@@ -2,9 +2,7 @@ module D1Lib (part1, part2) where
 
 import qualified Data.Char
 import qualified Data.Maybe
-
-zeroDigit :: Int
-zeroDigit = Data.Char.ord '0'
+import qualified Misc
 
 part1 :: String -> Int
 part1 str = part1Rec str 0 10 10
@@ -29,7 +27,7 @@ part1Rec (head : tail) sum fst sec
   where
     sec' = secondDigit fst sec
     new = finalAdd fst sec'
-    headInt = Data.Char.ord head - zeroDigit
+    headInt = Data.Char.ord head - Misc.zeroDigit
 
 part2 :: String -> Int
 part2 str = part2Rec str 0 10 10
@@ -51,7 +49,7 @@ part2Rec all@(head : tail) sum fst sec
   where
     sec' = secondDigit fst sec
     new = finalAdd fst sec'
-    headInt = Data.Char.ord head - zeroDigit
+    headInt = Data.Char.ord head - Misc.zeroDigit
 
 tryParseInt :: String -> (String, Maybe Int)
 tryParseInt ('o' : rest) = tryParseInt1 rest P1GetN
