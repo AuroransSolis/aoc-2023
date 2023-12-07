@@ -1,7 +1,7 @@
 module D2Lib (part1, part2, readID) where
 
-import qualified Misc
 import qualified Data.Char
+import qualified Misc
 
 maxR :: Int
 maxR = 12
