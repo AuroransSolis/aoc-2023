@@ -1,4 +1,4 @@
-module Misc (aocMain) where
+module Misc (aocMain, zeroDigit) where
 
 import qualified Data.Char
 import qualified System.IO
