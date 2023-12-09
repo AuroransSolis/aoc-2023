@@ -1,4 +1,4 @@
-module Misc (aocMain, zeroDigit) where
+module Misc (aocMain, zeroDigit, charToDigit) where
 
 import qualified Data.Char
 import qualified System.IO
@@ -13,3 +13,6 @@ aocMain filename part1 part2 = do
 
 zeroDigit :: Int
 zeroDigit = Data.Char.ord '0'
+
+charToDigit :: Char -> Int
+charToDigit char = Data.Char.ord char - zeroDigit
