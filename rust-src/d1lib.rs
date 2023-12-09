@@ -1,4 +1,4 @@
-pub fn part_1(input: &str) -> usize {
+pub fn part1(input: &str) -> usize {
     let input = input.as_bytes();
     let mut sum = 0;
     let mut i = 0;
@@ -25,7 +25,7 @@ pub fn part_1(input: &str) -> usize {
     sum
 }
 
-pub fn part_2(input: &str) -> usize {
+pub fn part2(input: &str) -> usize {
     let input = input.as_bytes();
     let mut sum = 0;
     let mut i = 0;
@@ -262,18 +262,18 @@ mod test {
     #[test]
     fn p1test() {
         let input = read_to_string("input/d1test1.txt").unwrap();
-        assert_eq!(super::part_1(&input), 142);
+        assert_eq!(super::part1(&input), 142);
     }
 
     #[test]
     fn p2test1() {
         let input = read_to_string("input/d1test2.txt").unwrap();
-        assert_eq!(super::part_2(&input), 281);
+        assert_eq!(super::part2(&input), 281);
     }
 
     #[test]
     fn p2test2() {
         let input = read_to_string("input/d1test3.txt").unwrap();
-        assert_eq!(super::part_2(&input), 316);
+        assert_eq!(super::part2(&input), 316);
     }
 }
