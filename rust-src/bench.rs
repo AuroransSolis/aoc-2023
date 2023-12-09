@@ -1,10 +1,15 @@
 mod d1lib;
+mod d2lib;
+mod d3lib;
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use std::fs::read_to_string;
 
-const BENCH_DATA: &[(&str, fn(&str) -> usize, fn(&str) -> usize)] =
-    &[("d1", d1lib::part_1, d1lib::part_2)];
+const BENCH_DATA: &[(&str, fn(&str) -> usize, fn(&str) -> usize)] = &[
+    ("d1", d1lib::part1, d1lib::part2),
+    ("d2", d2lib::part1, d2lib::part2),
+    ("d3", d3lib::part1, d3lib::part2),
+];
 
 pub fn run_benchmarks(c: &mut Criterion) {
     for (day, p1, p2) in BENCH_DATA.iter().copied() {

@@ -17,7 +17,7 @@ tests =
         , testCase "d2 readID" $ D2Lib.readID "123: a" 0 @?= ("a", 123)
         , aocTestCase "d2p1" "input/d2test.txt" D2Lib.part1 8
         , aocTestCase "d2p2" "input/d2test.txt" D2Lib.part2 2286
-        , aocTestCase "d3p1" "input/d3test1.txt" D3Lib.part1 4361
+        , aocTestCase "d3p1" "input/d3test.txt" D3Lib.part1 4361
         ]
 
 aocTestCase :: (Eq a, Show a) => String -> String -> (String -> a) -> a -> TestTree
