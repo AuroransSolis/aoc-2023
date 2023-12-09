@@ -26,8 +26,8 @@ breakMapGrid all@(head : tail) map
   where
     headVal = map head
 
-type BorderRowFn a = [a] -> [a] -> Int
-type MiddleRowFn a = [a] -> [a] -> [a] -> Int
+type BorderRowFn1 a = [a] -> [a] -> Int
+type MiddleRowFn1 a = [a] -> [a] -> [a] -> Int
 
 data ProcessGrid a = ProcessGrid
     { r0 :: [a]
@@ -36,17 +36,17 @@ data ProcessGrid a = ProcessGrid
     , rest :: [[a]]
     }
 
-makeProcess :: [[a]] -> ProcessGrid a
-makeProcess (r1 : r2 : rest) = ProcessGrid [] r1 r2 rest
+makeProcess1 :: [[a]] -> ProcessGrid a
+makeProcess1 (r1 : r2 : rest) = ProcessGrid [] r1 r2 rest
 
-walkGrid :: ProcessGrid a -> BorderRowFn a -> MiddleRowFn a -> Int
-walkGrid (ProcessGrid [] r1 r2 (newR2 : rest)) b m = b r1 r2 + walkGrid (ProcessGrid r1 r2 newR2 rest) b m
+walkGrid1 :: ProcessGrid a -> BorderRowFn1 a -> MiddleRowFn1 a -> Int
+walkGrid1 (ProcessGrid [] r1 r2 (newR2 : rest)) b m = b r1 r2 + walkGrid1 (ProcessGrid r1 r2 newR2 rest) b m
 -- Flipping the last two rows lets us reuse the same function as for the first two rows
-walkGrid (ProcessGrid r0 r1 [] rest) b m = b r1 r0
-walkGrid (ProcessGrid r0 r1 r2 (newR2 : rest)) b m = m r0 r1 r2 + walkGrid (ProcessGrid r1 r2 newR2 rest) b m
+walkGrid1 (ProcessGrid r0 r1 [] rest) b m = b r1 r0
+walkGrid1 (ProcessGrid r0 r1 r2 (newR2 : rest)) b m = m r0 r1 r2 + walkGrid1 (ProcessGrid r1 r2 newR2 rest) b m
 
 part1 :: String -> Int
-part1 str = walkGrid (makeProcess $ readMapGrid str readCV1) borderRow1 middleRow1
+part1 str = walkGrid1 (makeProcess1 $ readMapGrid str readCV1) borderRow1 middleRow1
 
 data CellVal1 = CV1Empty | Symbol | CV1Digit Int deriving (Eq, Show)
 
@@ -67,7 +67,7 @@ isCV1Digit _ = False
 tmp :: CellVal1
 tmp = Symbol
 
-borderRow1 :: BorderRowFn CellVal1
+borderRow1 :: BorderRowFn1 CellVal1
 borderRow1 (aHead : aTail) (bHead : bTail) = borderRowRec aTail bTail startHS startVal
   where
     startHS = aHead == Symbol || bHead == Symbol
@@ -86,7 +86,7 @@ borderRow1 (aHead : aTail) (bHead : bTail) = borderRowRec aTail bTail startHS st
             vertSymbol = bHead == Symbol
             emptyFinal = if hasSymbol || vertSymbol then prev else 0
 
-middleRow1 :: MiddleRowFn CellVal1
+middleRow1 :: MiddleRowFn1 CellVal1
 middleRow1 (r0Head : r0Tail) (r1Head : r1Tail) (r2Head : r2Tail) = middleRowRec r0Tail r1Tail r2Tail startHS startVal
   where
     startHS = r1Head == Symbol || r0Head == Symbol || r2Head == Symbol
@@ -108,21 +108,52 @@ middleRow1 (r0Head : r0Tail) (r1Head : r1Tail) (r2Head : r2Tail) = middleRowRec 
 part2 :: String -> Int
 part2 _ = 0
 
-data CellVal2 = CV2Empty | Gear | CV2Digit Int deriving (Eq)
-
-readCellVal2 :: Char -> CellVal2
-readCellVal2 char
-    | Data.Char.isDigit char = CV2Digit (Data.Char.ord char - Misc.zeroDigit)
-    | char == '*' = Gear
-    | otherwise = CV2Empty
-
-toCV2Digit :: CellVal2 -> Int
-toCV2Digit (CV2Digit val) = val
-toCV2Digit _ = 0
-
-isCV2Digit :: CellVal2 -> Bool
-isCV2Digit (CV2Digit _) = True
-isCV2Digit _ = False
+-- data CellVal2 = CV2Empty | Gear | CV2Digit Int deriving (Eq)
+-- 
+-- readCellVal2 :: Char -> CellVal2
+-- readCellVal2 char
+    -- | Data.Char.isDigit char = CV2Digit (Data.Char.ord char - Misc.zeroDigit)
+    -- | char == '*' = Gear
+    -- | otherwise = CV2Empty
+-- 
+-- toCV2Digit :: CellVal2 -> Int
+-- toCV2Digit (CV2Digit val) = val
+-- toCV2Digit _ = 0
+-- 
+-- isCV2Digit :: CellVal2 -> Bool
+-- isCV2Digit (CV2Digit _) = True
+-- isCV2Digit _ = False
+-- 
+-- makeProcess2 :: [[a]] -> ProcessGrid a
+-- makeProcess2 all@(r1 : r2 : _) = ProcessGrid [] r1 r2 all
+-- 
+-- data BorderStepData a = BorderStepData
+    -- { rA :: [a]
+    -- , rB :: [a]
+    -- , prevRA :: [a]
+    -- , prevRB :: [a]
+    -- }
+-- 
+-- data MiddleStepData a = MiddleStepData
+    -- { msdR0 :: [a]
+    -- , msdR1 :: [a]
+    -- , msdR2 :: [a]
+    -- , prevR0 :: [a]
+    -- , prevR1 :: [a]
+    -- , prevR2 :: [a]
+    -- }
+-- 
+-- type BorderRowFn2 a = BorderStepData a -> Int
+-- type MiddleRowFn2 a = MiddleStepData a -> Int
+-- 
+-- walkGrid2 :: ProcessGrid a -> BorderRowFn2 a -> MiddleRowFn2 a -> Int
+-- walkGrid2 (ProcessGrid [] r1 r2 (r1Full : rest@(r2Full : newR2 : _))) b m = b (BorderStepData r1 r2 [] []) + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
+-- -- Flipping the last two rows lets us reuse the same function as for the first two rows
+-- walkGrid2 (ProcessGrid r0 r1 [] rest) b m = b r1 r0
+-- walkGrid2 (ProcessGrid r0 r1 r2 (newR2 : rest)) b m = m r0 r1 r2 + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
 
 -- borderRow2 :: BorderRowFn CellVal2
--- borderRow2 (aHead : aTail) (bHead : bTail) = borderRowRec
+-- borderRow2 (BorderStepData (aPrv : aCur : aNxt : aTail) (bPrv : bCur : bNxt : bTail) prevA prevB) = case aCur of
+    -- '*' -> 
+--   where
+    
