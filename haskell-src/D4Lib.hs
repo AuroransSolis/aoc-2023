@@ -18,7 +18,7 @@ readWins (h1 : h2 : tail) wins =
              in
                 readWins tail' wins'
   where
-    h1Digit = if h1 == ' ' then 0 else (Misc.charToDigit h1) * 10
+    h1Digit = if h1 == ' ' then 0 else Misc.charToDigit h1 * 10
     h2Digit = Misc.charToDigit h2
     number = h1Digit + h2Digit
 
@@ -32,7 +32,7 @@ part1 str = part1Rec str
                 then (val, all)
                 else checkVals wins (drop 1 tail) val'
           where
-            h1Digit = if h1 == ' ' then 0 else (Misc.charToDigit h1) * 10
+            h1Digit = if h1 == ' ' then 0 else Misc.charToDigit h1 * 10
             h2Digit = Misc.charToDigit h2
             number = h1Digit + h2Digit
             isWin = number `elem` wins
@@ -56,7 +56,7 @@ part2 str = finalEval (part2Rec str []) []
                 then (acc, all)
                 else countWins wins (drop 1 tail) (acc + add)
           where
-            h1Digit = if h1 == ' ' then 0 else (Misc.charToDigit h1) * 10
+            h1Digit = if h1 == ' ' then 0 else Misc.charToDigit h1 * 10
             h2Digit = Misc.charToDigit h2
             number = h1Digit + h2Digit
             isWin = number `elem` wins
@@ -70,4 +70,4 @@ part2 str = finalEval (part2Rec str []) []
         [] -> 0
         (numHead : numTail) -> newSum + finalEval numTail (newSum : countList)
           where
-            newSum = 1 + (sum $ take numHead countList)
+            newSum = 1 + sum (take numHead countList)
