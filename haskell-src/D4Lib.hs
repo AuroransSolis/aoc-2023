@@ -47,27 +47,27 @@ part1 str = part1Rec str
         (_ : tail) -> part1Rec tail
 
 part2 :: String -> Int
-part2 str = finalEval $ traceShowId $ part2Rec str
+part2 str = finalEval (part2Rec str []) []
   where
-    getCardVal str = let (wins, tail') = readWins str [] in countWins wins tail'
-    finalEval list = case list of
+    countWins wins str acc = case str of
+        [] -> (acc, str)
+        all@(h1 : h2 : tail) ->
+            if h1 == 'C'
+                then (acc, all)
+                else countWins wins (drop 1 tail) (acc + add)
+          where
+            h1Digit = if h1 == ' ' then 0 else (Misc.charToDigit h1) * 10
+            h2Digit = Misc.charToDigit h2
+            number = h1Digit + h2Digit
+            isWin = number `elem` wins
+            add = if isWin then 1 else 0
+    getCardVal str = let (wins, tail') = readWins str [] in countWins wins tail' 0
+    part2Rec str acc = case str of
+        [] -> acc
+        ('C' : tail) -> let (val, tail') = getCardVal (trimStart tail) in part2Rec tail' (val : acc)
+        (_ : tail) -> part2Rec tail acc
+    finalEval numList countList = case numList of
         [] -> 0
-        (head : tail) -> 0
-    part2Rec str = case str of
-        [] -> []
-        ('C' : tail) -> let (val, tail') = getCardVal (trimStart tail) in (part2Rec tail') : val
-        (_ : tail) -> part2Rec tail
-
-countWins :: [Int] -> String -> (Int, String)
-countWins wins str = case str of
-    [] -> (0, str)
-    all@(h1 : h2 : tail) ->
-        if h1 == 'C'
-            then (0, all)
-            else add + countWins wins (drop 1 tail)
-      where
-        h1Digit = if h1 == ' ' then 0 else (Misc.charToDigit h1) * 10
-        h2Digit = Misc.charToDigit h2
-        number = h1Digit + h2Digit
-        isWin = number `elem` wins
-        add = if isWin then 1 else 0
+        (numHead : numTail) -> newSum + finalEval numTail (newSum : countList)
+          where
+            newSum = 1 + (sum $ take numHead countList)

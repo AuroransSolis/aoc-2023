@@ -21,6 +21,7 @@ tests =
         , aocTestCase "d3p1" "input/d3test.txt" D3Lib.part1 4361
         , aocTestCase "d3p2" "input/d3test.txt" D3Lib.part2 467835
         , aocTestCase "d4p1" "input/d4test.txt" D4Lib.part1 13
+        , aocTestCase "d4p2" "input/d4test.txt" D4Lib.part2 30
         ]
 
 aocTestCase :: (Eq a, Show a) => String -> String -> (String -> a) -> a -> TestTree
