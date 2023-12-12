@@ -3,6 +3,7 @@ module D3Lib (part1, part2) where
 import qualified Data.Char
 import Debug.Trace
 import qualified Misc
+import qualified Data.Maybe
 
 readMapGrid :: String -> (Char -> a) -> [[a]]
 readMapGrid grid map =
@@ -64,9 +65,6 @@ isCV1Digit :: CellVal1 -> Bool
 isCV1Digit (CV1Digit _) = True
 isCV1Digit _ = False
 
-tmp :: CellVal1
-tmp = Symbol
-
 borderRow1 :: BorderRowFn1 CellVal1
 borderRow1 (aHead : aTail) (bHead : bTail) = borderRowRec aTail bTail startHS startVal
   where
@@ -106,54 +104,84 @@ middleRow1 (r0Head : r0Tail) (r1Head : r1Tail) (r2Head : r2Tail) = middleRowRec 
             emptyFinal = if hasSymbol || vertSymbol then prev else 0
 
 part2 :: String -> Int
-part2 _ = 0
+part2 str = walkGrid2 (makeProcess2 $ readMapGrid str readCV2) borderRow2 (const 0)
 
--- data CellVal2 = CV2Empty | Gear | CV2Digit Int deriving (Eq)
--- 
--- readCellVal2 :: Char -> CellVal2
--- readCellVal2 char
-    -- | Data.Char.isDigit char = CV2Digit (Data.Char.ord char - Misc.zeroDigit)
-    -- | char == '*' = Gear
-    -- | otherwise = CV2Empty
--- 
--- toCV2Digit :: CellVal2 -> Int
--- toCV2Digit (CV2Digit val) = val
--- toCV2Digit _ = 0
--- 
--- isCV2Digit :: CellVal2 -> Bool
--- isCV2Digit (CV2Digit _) = True
--- isCV2Digit _ = False
--- 
--- makeProcess2 :: [[a]] -> ProcessGrid a
--- makeProcess2 all@(r1 : r2 : _) = ProcessGrid [] r1 r2 all
--- 
--- data BorderStepData a = BorderStepData
-    -- { rA :: [a]
-    -- , rB :: [a]
-    -- , prevRA :: [a]
-    -- , prevRB :: [a]
-    -- }
--- 
--- data MiddleStepData a = MiddleStepData
-    -- { msdR0 :: [a]
-    -- , msdR1 :: [a]
-    -- , msdR2 :: [a]
-    -- , prevR0 :: [a]
-    -- , prevR1 :: [a]
-    -- , prevR2 :: [a]
-    -- }
--- 
--- type BorderRowFn2 a = BorderStepData a -> Int
--- type MiddleRowFn2 a = MiddleStepData a -> Int
--- 
--- walkGrid2 :: ProcessGrid a -> BorderRowFn2 a -> MiddleRowFn2 a -> Int
--- walkGrid2 (ProcessGrid [] r1 r2 (r1Full : rest@(r2Full : newR2 : _))) b m = b (BorderStepData r1 r2 [] []) + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
--- -- Flipping the last two rows lets us reuse the same function as for the first two rows
--- walkGrid2 (ProcessGrid r0 r1 [] rest) b m = b r1 r0
--- walkGrid2 (ProcessGrid r0 r1 r2 (newR2 : rest)) b m = m r0 r1 r2 + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
+data CellVal2 = CV2Empty | Gear | CV2Digit Int deriving (Eq)
 
--- borderRow2 :: BorderRowFn CellVal2
--- borderRow2 (BorderStepData (aPrv : aCur : aNxt : aTail) (bPrv : bCur : bNxt : bTail) prevA prevB) = case aCur of
-    -- '*' -> 
---   where
-    
+readCV2 :: Char -> CellVal2
+readCV2 char
+    | Data.Char.isDigit char = CV2Digit $ Misc.charToDigit char
+    | char == '*' = Gear
+    | otherwise = CV2Empty
+
+toCV2Digit :: CellVal2 -> Int
+toCV2Digit (CV2Digit val) = val
+toCV2Digit _ = 0
+
+isCV2Digit :: CellVal2 -> Bool
+isCV2Digit (CV2Digit _) = True
+isCV2Digit _ = False
+
+makeProcess2 :: [[a]] -> ProcessGrid a
+makeProcess2 all@(r1 : r2 : _) = ProcessGrid [] r1 r2 all
+
+data BorderStepData a = BorderStepData
+    { rA :: [a]
+    , rB :: [a]
+    , prevRA :: [a]
+    , prevRB :: [a]
+    }
+
+data MiddleStepData a = MiddleStepData
+    { msdR0 :: [a]
+    , msdR1 :: [a]
+    , msdR2 :: [a]
+    , prevR0 :: [a]
+    , prevR1 :: [a]
+    , prevR2 :: [a]
+    }
+
+type BorderRowFn2 a = BorderStepData a -> Int
+type MiddleRowFn2 a = MiddleStepData a -> Int
+
+walkGrid2 :: ProcessGrid a -> BorderRowFn2 a -> MiddleRowFn2 a -> Int
+walkGrid2 (ProcessGrid [] r1 r2 (r1Full : rest@(r2Full : newR2 : _))) b m = b (BorderStepData r1 r2 [] []) + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
+-- Flipping the last two rows lets us reuse the same function as for the first two rows
+walkGrid2 (ProcessGrid r0 r1 [] rest) b m = b $ BorderStepData r1 r0 [] []
+walkGrid2 (ProcessGrid r0 r1 r2 (newR2 : rest)) b m = m (MiddleStepData r0 r1 r2 [] [] []) + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
+
+{-
+p5 p3 p0
+p6 ** p1
+p7 p4 p2
+-}
+
+defaultMul :: Maybe Int -> Int
+defaultMul mVal = Data.Maybe.fromMaybe 1 mVal
+
+borderRow2 :: BorderRowFn2 CellVal2
+borderRow2 (BorderStepData aList bList prevA prevB) = case (aList, bList) of
+    ([], []) -> 0
+    (aCur : aTail@(aNxt : _), bCur : bTail@(bNxt : _)) -> case (prevA, prevB) of
+        ([], []) -> 0
+        (pAHead : pATail, pBHead : pBTail) -> traceShowId $ p1 * p2
+          where
+            -- no p0
+            p1 = traceShowId . defaultMul $ readRight aTail (Just (1, 0))
+            p2 = traceShowId . defaultMul $ fmap (readLeft prevB) (readRight (bCur : bTail) (Just (1, 0)))
+            p3 = 
+
+readRight :: [CellVal2] -> Maybe (Int, Int) -> Maybe (Int, Int)
+readRight [] val = val
+readRight (head : tail) Nothing = case head of
+    CV2Digit digit -> readRight tail (Just (10, digit))
+    other -> Nothing
+readRight (head : tail) prev@(Just (mul, acc)) = case head of
+    CV2Digit digit -> readRight tail (Just (mul * 10, acc * 10 + digit))
+    other -> prev
+
+readLeft :: [CellVal2] -> (Int, Int) -> Int
+readLeft [] (mul, acc) = acc
+readLeft (head : tail) (mul, acc) = case head of
+    CV2Digit digit -> readLeft tail (mul * 10, acc + digit * 10)
+    other -> acc
