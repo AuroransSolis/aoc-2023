@@ -1,9 +1,12 @@
 module D3Lib (part1, part2) where
 
+import Control.Monad (when)
 import qualified Data.Char
+import Data.Functor ((<&>))
+import Data.List (uncons)
+import qualified Data.Maybe
 import Debug.Trace
 import qualified Misc
-import qualified Data.Maybe
 
 readMapGrid :: String -> (Char -> a) -> [[a]]
 readMapGrid grid map =
@@ -44,7 +47,10 @@ walkGrid1 :: ProcessGrid a -> BorderRowFn1 a -> MiddleRowFn1 a -> Int
 walkGrid1 (ProcessGrid [] r1 r2 (newR2 : rest)) b m = b r1 r2 + walkGrid1 (ProcessGrid r1 r2 newR2 rest) b m
 -- Flipping the last two rows lets us reuse the same function as for the first two rows
 walkGrid1 (ProcessGrid r0 r1 [] rest) b m = b r1 r0
-walkGrid1 (ProcessGrid r0 r1 r2 (newR2 : rest)) b m = m r0 r1 r2 + walkGrid1 (ProcessGrid r1 r2 newR2 rest) b m
+walkGrid1 (ProcessGrid r0 r1 r2 rest) b m =
+    m r0 r1 r2 + case uncons rest of
+        Just (head, tail) -> walkGrid1 (ProcessGrid r1 r2 head tail) b m
+        Nothing -> walkGrid1 (ProcessGrid r1 r2 [] []) b m
 
 part1 :: String -> Int
 part1 str = walkGrid1 (makeProcess1 $ readMapGrid str readCV1) borderRow1 middleRow1
@@ -104,9 +110,14 @@ middleRow1 (r0Head : r0Tail) (r1Head : r1Tail) (r2Head : r2Tail) = middleRowRec 
             emptyFinal = if hasSymbol || vertSymbol then prev else 0
 
 part2 :: String -> Int
-part2 str = walkGrid2 (makeProcess2 $ readMapGrid str readCV2) borderRow2 (const 0)
+part2 str = walkGrid2 (makeProcess1 $ readMapGrid str readCV2) borderRow2 middleRow2
 
 data CellVal2 = CV2Empty | Gear | CV2Digit Int deriving (Eq)
+
+instance Show CellVal2 where
+    show CV2Empty = "."
+    show Gear = "*"
+    show (CV2Digit val) = show val
 
 readCV2 :: Char -> CellVal2
 readCV2 char
@@ -144,44 +155,97 @@ data MiddleStepData a = MiddleStepData
 type BorderRowFn2 a = BorderStepData a -> Int
 type MiddleRowFn2 a = MiddleStepData a -> Int
 
-walkGrid2 :: ProcessGrid a -> BorderRowFn2 a -> MiddleRowFn2 a -> Int
-walkGrid2 (ProcessGrid [] r1 r2 (r1Full : rest@(r2Full : newR2 : _))) b m = b (BorderStepData r1 r2 [] []) + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
+walkGrid2 :: (Show a) => ProcessGrid a -> BorderRowFn2 a -> MiddleRowFn2 a -> Int
+walkGrid2 (ProcessGrid [] r1 r2 (newR2 : rest)) b m = b (BorderStepData r1 r2 [] []) + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
 -- Flipping the last two rows lets us reuse the same function as for the first two rows
-walkGrid2 (ProcessGrid r0 r1 [] rest) b m = b $ BorderStepData r1 r0 [] []
-walkGrid2 (ProcessGrid r0 r1 r2 (newR2 : rest)) b m = m (MiddleStepData r0 r1 r2 [] [] []) + walkGrid2 (ProcessGrid r1 r2 newR2 rest) b m
+walkGrid2 (ProcessGrid r0 r1 [] rest) b m = b (BorderStepData r1 r0 [] [])
+walkGrid2 (ProcessGrid r0 r1 r2 rest) b m =
+    m (MiddleStepData r0 r1 r2 [] [] []) + case uncons rest of
+        Just (head, tail) -> walkGrid2 (ProcessGrid r1 r2 head tail) b m
+        Nothing -> walkGrid2 (ProcessGrid r1 r2 [] []) b m
+
+defaultMul :: Int -> Int
+defaultMul n = max n 1
 
 {-
-p5 p3 p0
-p6 ** p1
-p7 p4 p2
+n5 n3 n0
+n6 ** n1
+n7 n4 n2
 -}
-
-defaultMul :: Maybe Int -> Int
-defaultMul mVal = Data.Maybe.fromMaybe 1 mVal
 
 borderRow2 :: BorderRowFn2 CellVal2
 borderRow2 (BorderStepData aList bList prevA prevB) = case (aList, bList) of
     ([], []) -> 0
-    (aCur : aTail@(aNxt : _), bCur : bTail@(bNxt : _)) -> case (prevA, prevB) of
-        ([], []) -> 0
-        (pAHead : pATail, pBHead : pBTail) -> traceShowId $ p1 * p2
-          where
-            -- no p0
-            p1 = traceShowId . defaultMul $ readRight aTail (Just (1, 0))
-            p2 = traceShowId . defaultMul $ fmap (readLeft prevB) (readRight (bCur : bTail) (Just (1, 0)))
-            p3 = 
+    (aCur : aTail, bCur : bTail) -> gearVal + borderRow2 (BorderStepData aTail bTail (aCur : prevA) (bCur : prevB))
+      where
+        gearVal = case aCur of
+            Gear -> case filter (> 0) [n1, n2, n4, n6, n7] of
+                [n1, n2] -> n1 * n2
+                _ -> 0
+              where
+                n1 = snd $ readRight aTail (1, 0)
+                n2 = readLeft (bCur : prevB) $ readRight bTail (1, 0)
+                n4 = if n2 == 0 then readLeft (bCur : prevB) (1, 0) else 0
+                n6 = readLeft prevA (1, 0)
+                n7 = if n4 == 0 then readLeft prevB (1, 0) else 0
+            _ -> 0
 
-readRight :: [CellVal2] -> Maybe (Int, Int) -> Maybe (Int, Int)
+middleRow2 :: MiddleRowFn2 CellVal2
+middleRow2 (MiddleStepData r0List r1List r2List r0Prev r1Prev r2Prev) = case (r0List, r1List, r2List) of
+    ([], [], []) -> 0
+    (r0Cur : r0Tail, r1Cur : r1Tail, r2Cur : r2Tail) -> gearVal + middleRow2 middleStepData'
+      where
+        r0Prev' = r0Cur : r0Prev
+        r1Prev' = r1Cur : r1Prev
+        r2Prev' = r2Cur : r2Prev
+        middleStepData' = MiddleStepData r0Tail r1Tail r2Tail r0Prev' r1Prev' r2Prev'
+        gearVal = case r1Cur of
+            Gear -> case filter (> 0) [r0, r1L, r1R, r2] of
+                [n1] -> if double then n1 else 0
+                [n1, n2] -> n1 * n2
+                _ -> 0
+              where
+                (r0Mul0, r0Acc0) = readRight r0Tail (1, 0)
+                (_, r1R) = readRight r1Tail (1, 0)
+                (r2Mul0, r2Acc0) = readRight r2Tail (1, 0)
+                (r0, double0) = case r0Cur of
+                    CV2Digit val -> (readLeft r0Prev (r0Mul0 * 10, r0Mul0 * val + r0Acc0), False)
+                    _ ->
+                        if r0Acc1 > 0 && r0Acc0 > 0
+                            then (r0Acc0 * r0Acc1, True)
+                            else (r0Acc0 + r0Acc1, False)
+                      where
+                        r0Acc1 = readLeft r0Prev (1, 0)
+                (r2, double2) = case r2Cur of
+                    CV2Digit val -> (readLeft r2Prev (r2Mul0 * 10, r2Mul0 * val + r2Acc0), False)
+                    _ ->
+                        if r2Acc1 > 0 && r2Acc0 > 0
+                            then (r2Acc0 * r2Acc1, True)
+                            else (r2Acc0 + r2Acc1, False)
+                      where
+                        r2Acc1 = readLeft r2Prev (1, 0)
+                r1L = readLeft r1Prev (1, 0)
+                double = double0 || double2
+            _ -> 0
+
+traceShowPfx :: (Show a) => [Char] -> a -> a
+traceShowPfx pfx a = trace (pfx ++ ": " ++ show a) a
+
+traceShowIf :: (Show a) => (a -> Bool) -> a -> a
+traceShowIf fn a =
+    if fn a
+        then traceShowId a
+        else a
+
+readRight :: [CellVal2] -> (Int, Int) -> (Int, Int)
 readRight [] val = val
-readRight (head : tail) Nothing = case head of
-    CV2Digit digit -> readRight tail (Just (10, digit))
-    other -> Nothing
-readRight (head : tail) prev@(Just (mul, acc)) = case head of
-    CV2Digit digit -> readRight tail (Just (mul * 10, acc * 10 + digit))
+readRight (head : tail) prev@(mul, acc) = case head of
+    CV2Digit digit -> readRight tail (mul * 10, acc * 10 + digit)
     other -> prev
 
 readLeft :: [CellVal2] -> (Int, Int) -> Int
 readLeft [] (mul, acc) = acc
+readLeft (head : tail) (0, _) = 0
 readLeft (head : tail) (mul, acc) = case head of
-    CV2Digit digit -> readLeft tail (mul * 10, acc + digit * 10)
+    CV2Digit digit -> readLeft tail (mul * 10, acc + digit * mul)
     other -> acc

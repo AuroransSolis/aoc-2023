@@ -135,7 +135,7 @@ mod test {
 
     #[test]
     fn p1test1() {
-        let input = read_to_string("input/d3test.txt").unwrap();
+        let input = read_to_string("input/d3test1.txt").unwrap();
         assert_eq!(super::part1(&input), 4361);
     }
 }
