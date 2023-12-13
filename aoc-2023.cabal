@@ -2,6 +2,8 @@ cabal-version: 2.4
 name: aoc2023
 version: 0.1.0.0
 
+default-extensions: ViewPatterns
+
 executable d1
     main-is: D1Bin.hs
     hs-source-dirs: haskell-src
