@@ -164,30 +164,28 @@ walkGrid2 (ProcessGrid r0 r1 r2 rest) b m =
         Just (head, tail) -> walkGrid2 (ProcessGrid r1 r2 head tail) b m
         Nothing -> walkGrid2 (ProcessGrid r1 r2 [] []) b m
 
-defaultMul :: Int -> Int
-defaultMul n = max n 1
-
-{-
-n5 n3 n0
-n6 ** n1
-n7 n4 n2
--}
-
 borderRow2 :: BorderRowFn2 CellVal2
 borderRow2 (BorderStepData aList bList prevA prevB) = case (aList, bList) of
     ([], []) -> 0
     (aCur : aTail, bCur : bTail) -> gearVal + borderRow2 (BorderStepData aTail bTail (aCur : prevA) (bCur : prevB))
       where
         gearVal = case aCur of
-            Gear -> case filter (> 0) [n1, n2, n4, n6, n7] of
+            Gear -> case filter (> 0) [rAR, rB, rAL] of
+                [n1] -> if doubleB then n1 else 0
                 [n1, n2] -> n1 * n2
                 _ -> 0
               where
-                n1 = snd $ readRight aTail (1, 0)
-                n2 = readLeft (bCur : prevB) $ readRight bTail (1, 0)
-                n4 = if n2 == 0 then readLeft (bCur : prevB) (1, 0) else 0
-                n6 = readLeft prevA (1, 0)
-                n7 = if n4 == 0 then readLeft prevB (1, 0) else 0
+                rAR = snd $ readRight aTail (1, 0)
+                (rBMul0, rBAcc0) = readRight bTail (1, 0)
+                (rB, doubleB) = case bCur of
+                    CV2Digit val -> (readLeft prevB (rBMul0 * 10, rBMul0 * val + rBAcc0), False)
+                    _ ->
+                        if rBAcc1 > 0 && rBAcc0 > 0
+                            then (rBAcc0 * rBAcc1, True)
+                            else (rBAcc0 + rBAcc1, False)
+                      where
+                        rBAcc1 = readLeft prevB (1, 0)
+                rAL = readLeft prevA (1, 0)
             _ -> 0
 
 middleRow2 :: MiddleRowFn2 CellVal2
