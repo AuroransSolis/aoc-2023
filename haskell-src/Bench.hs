@@ -13,6 +13,7 @@ benchData =
     , ("d2", D2Lib.part1, D2Lib.part2)
     , ("d3", D3Lib.part1, D3Lib.part2)
     , ("d4", D4Lib.part1, D4Lib.part2)
+    , ("d5", D5Lib.part1, D5Lib.part2)
     ]
 
 buildBench :: BenchData -> Benchmark
