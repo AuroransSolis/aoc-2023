@@ -35,6 +35,10 @@ path = "rust-src/d4bin.rs"
 name = "d5"
 path = "rust-src/d5bin.rs"
 
+[[bin]]
+name = "d6"
+path = "rust-src/d6bin.rs"
+
 [[bench]]
 name = "bench"
 path = "rust-src/bench.rs"

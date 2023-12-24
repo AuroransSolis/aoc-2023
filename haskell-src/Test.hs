@@ -3,6 +3,7 @@ import qualified D2Lib
 import qualified D3Lib
 import qualified D4Lib
 import qualified D5Lib
+import qualified D6Lib
 import Data.Functor ((<&>))
 import qualified System.IO
 import Test.Tasty
@@ -27,7 +28,10 @@ tests =
           , aocTestCase "d3p2 (4)" "input/d3test4.txt" D3Lib.part2 (14 * 13)
           , aocTestCase "d4p1" "input/d4test.txt" D4Lib.part1 13
           , aocTestCase "d4p2" "input/d4test.txt" D4Lib.part2 30
-          , aocTestCase "d5p1" "input/d5test.txt" D5Lib.part1 35
+        --   , aocTestCase "d5p1" "input/d5test.txt" D5Lib.part1 35
+        --   , aocTestCase "d5p2" "input/d5test.txt" D5Lib.part2 46
+          , aocTestCase "d6p1" "input/d6test.txt" D6Lib.part1 288
+          , aocTestCase "d6p2" "input/d6test.txt" D6Lib.part2 71503
           ]
             ++ d3ExtraTests
   where

@@ -14,6 +14,7 @@ const BENCH_DATA: &[(&str, fn(&str) -> usize, fn(&str) -> usize)] = &[
     ("d3", d3lib::part1, d3lib::part2),
     ("d4", d4lib::part1, d4lib::part2),
     ("d5", d5lib::part1, d5lib::part2),
+    ("d6", d6lib::part1, d6lib::part2),
 ];
 
 pub fn run_benchmarks(c: &mut Criterion) {
