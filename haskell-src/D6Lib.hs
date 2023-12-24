@@ -13,18 +13,20 @@ part1 str = product $ zipWith solvePair times dists
         ' ' -> readTimes tail times' 0
         other -> readTimes tail times (acc * 10 + Misc.charToDigit other)
       where
-        times' = if acc > 0
-            then acc : times
-            else times
+        times' =
+            if acc > 0
+                then acc : times
+                else times
     dists = readDists (drop 9 line2) [] 0
     readDists (head : tail) dists acc = case head of
         '\n' -> acc : dists
         ' ' -> readDists tail dists' 0
         other -> readDists tail dists (acc * 10 + Misc.charToDigit other)
       where
-        dists' = if acc > 0
-            then acc : dists
-            else dists
+        dists' =
+            if acc > 0
+                then acc : dists
+                else dists
     solvePair time dist = end - start'
       where
         time' = int2Float time
@@ -37,7 +39,6 @@ part1 str = product $ zipWith solvePair times dists
                 then floor start
                 else floor start + 1
         end = floor (time'' + disc)
-
 
 part2 :: String -> Int
 part2 str = end - start'
