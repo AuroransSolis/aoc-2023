@@ -119,7 +119,7 @@ cardFromChar2 char = case char of
     'T' -> C2T
     'Q' -> C2Q
     'K' -> C2K
-    'A' -> C2A
+    _ -> C2A
 
 handFromLine2 :: [CardType2] -> Int -> Hand2
 handFromLine2 cards = Hand2 cards handType
