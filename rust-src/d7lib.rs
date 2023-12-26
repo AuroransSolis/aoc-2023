@@ -1,7 +1,5 @@
 use std::cmp::Ordering;
 
-use util::ArrayVec;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum HandType {
     HighCard,
@@ -247,50 +245,97 @@ impl Hand2 {
             wager = wager * 10 + (input[*i] - b'0') as usize;
             *i += 1;
         }
-        let mut types = ArrayVec::new();
-        insert_card(c0, &mut types);
-        insert_card(c1, &mut types);
-        insert_card(c2, &mut types);
-        insert_card(c3, &mut types);
-        insert_card(c4, &mut types);
-        let hand_type = match &types[..] {
-            [] | [_] => HandType::FiveKind,
-            // see haskell version for reasoning
-            &[(c0, _), (c1, _)] => match [c0, c1] {
-                [3, 2] | [2, 2 | 3] => HandType::FullHouse,
-                _ => HandType::FourKind,
-            },
-            // see haskell version for reasoning
-            &[(c0, _), (c1, _), (c2, _)] => {
-                if c0 + c1 + c2 == 5 && [c0, c1, c2].contains(&2) {
-                    HandType::TwoPair
-                } else {
+        // sorting done by sorting network
+        // [(0, 3), (1, 4)]
+        let [c0, c3] = pair_sort(c0, c3);
+        let [c1, c4] = pair_sort(c1, c4);
+        // [(0, 2), (1, 3)]
+        let [c0, c2] = pair_sort(c0, c2);
+        let [c1, c3] = pair_sort(c1, c3);
+        // [(0, 1), (2, 4)]
+        let [c0, c1] = pair_sort(c0, c1);
+        let [c2, c4] = pair_sort(c2, c4);
+        // [(1, 2), (3, 4)]
+        let [c1, c2] = pair_sort(c1, c2);
+        let [c3, c4] = pair_sort(c3, c4);
+        // [(2, 3)]
+        let [c2, c3] = pair_sort(c2, c3);
+        // find hand type
+        let eq01 = c0 == c1;
+        let eq12 = c1 == c2;
+        let eq23 = c2 == c3;
+        let eq34 = c3 == c4;
+        let hand_type = if eq01 && eq12 && eq23 && eq34 {
+            HandType::FiveKind
+        } else {
+            let mid_3k = eq12 && eq23;
+            if mid_3k && (eq01 || eq34) {
+                HandType::FourKind
+            } else {
+                let srt_3k = eq01 && eq12;
+                let end_3k = eq23 && eq34;
+                if (srt_3k && eq34) || (end_3k && eq01) {
+                    HandType::FullHouse
+                } else if srt_3k || mid_3k || end_3k {
                     HandType::ThreeKind
+                } else {
+                    match [eq01, eq12, eq23, eq34] {
+                        [true, false, true, false]
+                        | [true, false, false, true]
+                        | [false, true, false, true] => HandType::TwoPair,
+                        [true, false, false, false]
+                        | [false, true, false, false]
+                        | [false, false, true, false]
+                        | [false, false, false, true] => HandType::OnePair,
+                        _ => HandType::HighCard,
+                    }
                 }
             }
-            // see haskell version for reasoning
-            [_, _, _, _] => HandType::OnePair,
-            _ => HandType::HighCard,
+        };
+        let hand_type = if c4 == CardType2::CJ {
+            if c3 == CardType2::CJ {
+                if c2 == CardType2::CJ {
+                    if c1 == CardType2::CJ {
+                        // both four or five jokers => FiveKind
+                        HandType::FiveKind
+                    } else {
+                        // three jokers
+                        match hand_type {
+                            HandType::FullHouse => HandType::FiveKind,
+                            HandType::ThreeKind => HandType::FourKind,
+                            HandType::HighCard => HandType::FourKind,
+                            _ => hand_type,
+                        }
+                    }
+                } else {
+                    // two jokers
+                    match hand_type {
+                        HandType::FullHouse => HandType::FiveKind,
+                        HandType::TwoPair => HandType::FourKind,
+                        HandType::OnePair => HandType::ThreeKind,
+                        HandType::HighCard => HandType::ThreeKind,
+                        _ => hand_type,
+                    }
+                }
+            } else {
+                // one joker
+                match hand_type {
+                    HandType::FourKind => HandType::FiveKind,
+                    HandType::ThreeKind => HandType::FourKind,
+                    HandType::TwoPair => HandType::FullHouse,
+                    HandType::OnePair => HandType::ThreeKind,
+                    HandType::HighCard => HandType::OnePair,
+                    _ => hand_type,
+                }
+            }
+        } else {
+            // no jokers
+            hand_type
         };
         Hand2 {
             cards: original,
             hand_type,
             wager,
-        }
-    }
-}
-
-fn insert_card(card: CardType2, types: &mut ArrayVec<(u8, CardType2), 5>) {
-    match card {
-        CardType2::CJ => {}
-        other => {
-            for i in 0..types.len() {
-                if types[i].1 == other {
-                    types[i].0 += 1;
-                    return;
-                }
-            }
-            types.push((1, other));
         }
     }
 }
@@ -324,7 +369,7 @@ mod test {
     #[test]
     fn part1test2() {
         let input = read_to_string("input/d7test2.txt").unwrap();
-        assert_eq!(super::part1(&input), (1..=12).map(|n| n * n).sum());
+        assert_eq!(super::part1(&input), 649);
     }
 
     #[test]
