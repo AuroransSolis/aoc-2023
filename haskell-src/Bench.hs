@@ -5,6 +5,7 @@ import qualified D3Lib
 import qualified D4Lib
 import qualified D5Lib
 import qualified D6Lib
+import qualified D7Lib
 import qualified System.IO
 
 type BenchData = (String, String -> Int, String -> Int)
@@ -17,6 +18,7 @@ benchData =
     , ("d4", D4Lib.part1, D4Lib.part2)
     -- , ("d5", D5Lib.part1, D5Lib.part2)
     , ("d6", D6Lib.part1, D6Lib.part2)
+    , ("d7", D7Lib.part1, D7Lib.part2)
     ]
 
 buildBench :: BenchData -> Benchmark

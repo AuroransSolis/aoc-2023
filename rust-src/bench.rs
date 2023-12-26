@@ -4,6 +4,7 @@ mod d3lib;
 mod d4lib;
 mod d5lib;
 mod d6lib;
+mod d7lib;
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use std::fs::read_to_string;
@@ -15,6 +16,7 @@ const BENCH_DATA: &[(&str, fn(&str) -> usize, fn(&str) -> usize)] = &[
     ("d4", d4lib::part1, d4lib::part2),
     ("d5", d5lib::part1, d5lib::part2),
     ("d6", d6lib::part1, d6lib::part2),
+    ("d7", d7lib::part1, d7lib::part2),
 ];
 
 pub fn run_benchmarks(c: &mut Criterion) {
